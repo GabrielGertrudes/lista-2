@@ -66,6 +66,45 @@ app.post('/exercicio4', (req, res) => {
     res.json({ "mensagem": `A velocidade média do ${nomePiloto} foi ${velocidadeMedia} km/h.` });
 })
 
+/* 5. Faça uma API que calcule e imprima o salário reajustado de um funcionário de acordo com a seguinte regra:
+    • Salários até 2.000, reajuste de 50%
+    • Salários maiores que 2.000, reajuste de 30% */
+
+    app.post('/exercicio5', (req, res) => {
+        const {salario} = req.body;
+    
+        let salarioReajustado;
+    
+        if (salario <= 2000) {
+            salarioReajustado = salario * 1.5;
+        } else {
+            salarioReajustado = salario * 1.3;
+        }
+    
+        res.json({ "salarioReajustado": salarioReajustado });
+    })
+
+/* 6. Construa uma API que calcule o peso ideal de uma pessoa. 
+Dados de entrada: altura e sexo. Fórmulas para cálculo do peso:
+    • peso ideal de homem = (72,7 x altura) – 58
+    • peso ideal da mulher = (62,1 x altura) – 44,7 */
+
+    app.post('/exercicio6', (req, res) => {
+        const pessoas = req.body.pessoas;
+    
+        const pesosIdeais = pessoas.map(pessoa => {
+            let pesoIdeal;
+            if (pessoa.sexo.toLowerCase() === 'homem') {
+                pesoIdeal = (72.7 * pessoa.altura) - 58;
+            } else if (pessoa.sexo.toLowerCase() === 'mulher') {
+                pesoIdeal = (62.1 * pessoa.altura) - 44.7;
+            } 
+            return pesoIdeal.toFixed(2);
+        });
+    
+        res.json({ "pesosIdeais": pesosIdeais });
+    })
+
 /* 7. Faça uma api para ler o código e o preço de 15 produtos, calcular e escrever:
     • O maior preço lido; e
     • A média aritmética dos preços dos produtos.
@@ -101,8 +140,111 @@ app.post('/exercicio7', (req, res) => {
     })
 })
 
+/* 8. Uma empresa concederá um aumento de salário aos seus funcionários, variável de acordo com o cargo, conforme a tabela abaixo. 
+Faça uma API que leia o salário e o código do cargo de um funcionário e calcule o seu novo salário. 
+Se o cargo do funcionário não estiver na tabela, ele deverá receber 15% de aumento. 
+Mostre o salário antigo, o novo salário e a diferença entre ambos.
+Código do Cargo -> Percentual:
+    • 101 -> 5%
+    • 102 -> 7,5%
+    • 103 -> 10% */
 
+app.post('/exercicio8', (req, res) => {
+    const { salario, codigoCargo } = req.body;
 
+    let aumentoPercentual, descricaoAumento;
+    switch (codigoCargo) {
+        case 101:
+            aumentoPercentual = 0.05;
+            descricaoAumento = "5% de aumento";
+            break;
+        case 102:
+            aumentoPercentual = 0.075;
+            descricaoAumento = "7.5% de aumento";
+            break;
+        case 103:
+            aumentoPercentual = 0.1;
+            descricaoAumento = "10% de aumento";
+            break;
+        default:
+            aumentoPercentual = 0.15; 
+            descricaoAumento = "15% de aumento (padrão)";
+            break;
+    }
+
+    const novoSalario = salario * (1 + aumentoPercentual);
+    const diferenca = novoSalario - salario;
+
+    res.json({
+        "salarioAntigo": salario.toFixed(2),
+        "novoSalario": novoSalario.toFixed(2),
+        "diferenca": diferenca.toFixed(2),
+        "descricaoAumento": descricaoAumento
+    });
+})
+
+/* 9. Faça uma API que receba o valor do salário mínimo, o número de horas trabalhadas, o número de dependentes do funcionário e a quantidade de horas extras trabalhadas. 
+Calcule e imprima o salário a receber do funcionário seguindo as regras abaixo:
+
+    • Valor da hora trabalhada é igual a 1/5 do salário mínimo;
+    • Salário do mês é igual ao número de horas trabalhadas vezes o valor da hora trabalhada;
+    • Para cada dependente acréscimo de 32 reais;
+    • Para cada hora extra trabalhada o cálculo do valor da hora trabalhada acrescida de 50 %;
+    • Salário bruto é igual ao salário do mês mais os valores dos dependentes mais os valores das horas extras;
+    • Cálculo do valor do imposto de renda retido na fonte segue a tabela abaixo:
+        IRRF | Salário Bruto
+        Isento Inferior a 2.000
+        10% De 2.000 a 5.000
+        20% Superior a 5.000
+    • Salário líquido é igual ao salário bruto menos IRRF;
+    • A gratificação segue a próxima tabela:
+          Salário Líquido | Gratificações
+          Até 3.500 | 1.000 reais
+          Superior a 3.500 | 500 reais
+    • Salário a receber do funcionário é igual ao salário líquido mais a gratificação. */
+
+    app.post('/exercicio9', (req, res) => {
+        const { salarioMinimo, horasTrabalhadas, dependentes, horasExtras } = req.body;
+    
+        const valorHoraTrabalhada = salarioMinimo / 5;
+    
+        const salarioMes = horasTrabalhadas * valorHoraTrabalhada;
+    
+        const valorDependentes = dependentes * 32;
+    
+        const valorHoraExtra = valorHoraTrabalhada * 1.5;
+        const salarioHorasExtras = horasExtras * valorHoraExtra;
+    
+        const salarioBruto = salarioMes + valorDependentes + salarioHorasExtras;
+    
+        let irrf;
+        if (salarioBruto <= 2000) {
+            irrf = 0;
+        } else if (salarioBruto <= 5000) {
+            irrf = (salarioBruto - 2000) * 0.1;
+        } else {
+            irrf = 300 + (salarioBruto - 5000) * 0.2;
+        }
+    
+        const salarioLiquido = salarioBruto - irrf;
+    
+        let gratificacao;
+        if (salarioLiquido <= 3500) {
+            gratificacao = 1000;
+        } else {
+            gratificacao = 500;
+        }
+    
+        const salarioReceber = salarioLiquido + gratificacao;
+    
+        res.json({
+            "salarioReceber": salarioReceber.toFixed(2),
+            "salarioLiquido": salarioLiquido.toFixed(2),
+            "irrf": irrf.toFixed(2),
+            "gratificacao": gratificacao.toFixed(2)
+        });
+    });
+    
 
 // start da aplicaão na porta definida
 app.listen(port, () => {
