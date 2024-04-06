@@ -35,9 +35,10 @@ app.post('/exercicio2', (req, res) => {
 
     if (salario < 1000) {
         const novoSalario = salario * 1.3; 
-        res.json({ "novoSalario": novoSalario });
-    } else {
-        res.json({ "mensagem": "Funcionário não tem direito ao aumento." });
+        res.json( { "novoSalario": novoSalario });
+    } else  {
+        
+        res.json({ "mensagem": "Funcionário não tem direito ao aumentoS" });
     }
 })
 
@@ -46,9 +47,9 @@ o total de vendas por ele efetuadas e o percentual que ganha sobre o total de ve
 Calcular o salário total do vendedor. Escrever o nome do vendedor e seu salário total. */
 
 app.post('/exercicio3', (req, res) => {
-    const { nome, salarioFixo, totalVendas, percentualComissao } = req.body;
+    const { nome, salarioFixo, totalDeVendas, percentualDeComissao } = req.body;
 
-    const comissao = totalVendas * (percentualComissao / 100);
+    const  comissao = totalDeVendas * (percentualDeComissao / 100);
     const salarioTotal = salarioFixo + comissao;
 
     res.json({ "nome": nome, "salarioTotal": salarioTotal });
@@ -59,11 +60,11 @@ O programa deve calcular a velocidade média - Velocidade = Distância / Tempo -
 e exibir a seguinte frase: A velocidade média do <nome do piloto> foi <velocidade media calculada> km/h. */
 
 app.post('/exercicio4', (req, res) => {
-    const { nomePiloto, distanciaPercorrida, tempoPercorridoHoras } = req.body;
+    const { nomeDoPiloto, distanciaPercorrida, tempoPercorridoHoras } = req.body;
 
     const velocidadeMedia = distanciaPercorrida / tempoPercorridoHoras;
 
-    res.json({ "mensagem": `A velocidade média do ${nomePiloto} foi ${velocidadeMedia} km/h.` });
+    res.json({ "mensagem": `A velocidade media do ${nomeDoPiloto} foi de ${velocidadeMedia} km/h.` });
 })
 
 /* 5. Faça uma API que calcule e imprima o salário reajustado de um funcionário de acordo com a seguinte regra:
@@ -72,7 +73,6 @@ app.post('/exercicio4', (req, res) => {
 
     app.post('/exercicio5', (req, res) => {
         const {salario} = req.body;
-    
         let salarioReajustado;
     
         if (salario <= 2000) {
@@ -81,7 +81,7 @@ app.post('/exercicio4', (req, res) => {
             salarioReajustado = salario * 1.3;
         }
     
-        res.json({ "salarioReajustado": salarioReajustado });
+        res.json({ "salarioReajustado": salarioReajustado }) ;
     })
 
 /* 6. Construa uma API que calcule o peso ideal de uma pessoa. 
@@ -91,19 +91,25 @@ Dados de entrada: altura e sexo. Fórmulas para cálculo do peso:
 
     app.post('/exercicio6', (req, res) => {
         const pessoas = req.body.pessoas;
+        const pesosIdeais = [];
     
-        const pesosIdeais = pessoas.map(pessoa => {
-            let pesoIdeal;
-            if (pessoa.sexo.toLowerCase() === 'homem') {
-                pesoIdeal = (72.7 * pessoa.altura) - 58;
-            } else if (pessoa.sexo.toLowerCase() === 'mulher') {
-                pesoIdeal = (62.1 * pessoa.altura) - 44.7;
-            } 
-            return pesoIdeal.toFixed(2);
+        if (pessoas && Array.isArray(pessoas)) {
+            pessoas.forEach(pessoa => {
+                if (pessoa && pessoa.altura && pessoa.sexo) {
+                    let pesoIdeal;
+                if (pessoa.sexo.toLowerCase() === 'homem') {
+                        pesoIdeal = (72.7 * pessoa.altura) - 58;
+                } else if (pessoa.sexo.toLowerCase() === 'mulher') {
+                        pesoIdeal = (62.1 * pessoa.altura) - 44.7;
+                } 
+            if (pesoIdeal !== undefined) {
+                        pesosIdeais.push(pesoIdeal.toFixed(2));
+                }
+                }
         });
-    
-        res.json({ "pesosIdeais": pesosIdeais });
-    })
+        }
+        res.json({ "pesos ideais de cada um!": pesosIdeais });
+    });
 
 /* 7. Faça uma api para ler o código e o preço de 15 produtos, calcular e escrever:
     • O maior preço lido; e
@@ -151,7 +157,6 @@ Código do Cargo -> Percentual:
 
 app.post('/exercicio8', (req, res) => {
     const { salario, codigoCargo } = req.body;
-
     let aumentoPercentual, descricaoAumento;
     switch (codigoCargo) {
         case 101:
@@ -168,18 +173,17 @@ app.post('/exercicio8', (req, res) => {
             break;
         default:
             aumentoPercentual = 0.15; 
-            descricaoAumento = "15% de aumento (padrão)";
+            descricaoAumento = "15% de aumento (padrão!)";
             break;
     }
 
     const novoSalario = salario * (1 + aumentoPercentual);
     const diferenca = novoSalario - salario;
-
     res.json({
-        "salarioAntigo": salario.toFixed(2),
-        "novoSalario": novoSalario.toFixed(2),
+        "salario antigo": salario.toFixed(2),
+        "novo saalario": novoSalario.toFixed(2),
         "diferenca": diferenca.toFixed(2),
-        "descricaoAumento": descricaoAumento
+        "descricao do aumento": descricaoAumento
     });
 })
 
@@ -204,14 +208,13 @@ Calcule e imprima o salário a receber do funcionário seguindo as regras abaixo
     • Salário a receber do funcionário é igual ao salário líquido mais a gratificação. */
 
     app.post('/exercicio9', (req, res) => {
-        const { salarioMinimo, horasTrabalhadas, dependentes, horasExtras } = req.body;
+        const { salarioMinimo, horasDeTrabalho, dependentes, horasExtras } = req.body;
     
         const valorHoraTrabalhada = salarioMinimo / 5;
     
-        const salarioMes = horasTrabalhadas * valorHoraTrabalhada;
+        const salarioMes = horasDeTrabalho * valorHoraTrabalhada;
     
         const valorDependentes = dependentes * 32;
-    
         const valorHoraExtra = valorHoraTrabalhada * 1.5;
         const salarioHorasExtras = horasExtras * valorHoraExtra;
     
@@ -225,7 +228,6 @@ Calcule e imprima o salário a receber do funcionário seguindo as regras abaixo
         } else {
             irrf = 300 + (salarioBruto - 5000) * 0.2;
         }
-    
         const salarioLiquido = salarioBruto - irrf;
     
         let gratificacao;
@@ -234,19 +236,18 @@ Calcule e imprima o salário a receber do funcionário seguindo as regras abaixo
         } else {
             gratificacao = 500;
         }
-    
         const salarioReceber = salarioLiquido + gratificacao;
     
         res.json({
-            "salarioReceber": salarioReceber.toFixed(2),
-            "salarioLiquido": salarioLiquido.toFixed(2),
-            "irrf": irrf.toFixed(2),
-            "gratificacao": gratificacao.toFixed(2)
+            "salario a receber": salarioReceber.toFixed(2),
+            "salario liquido": salarioLiquido.toFixed(2),
+            "irrrf": irrf.toFixed(2),
+            "gratificação": gratificacao.toFixed(2)
         });
     });
     
 
-// start da aplicaão na porta definida
+// start da aplicação na porta definida
 app.listen(port, () => {
     console.log("Aplicação iniciada em http://localhost:3000")
 })
